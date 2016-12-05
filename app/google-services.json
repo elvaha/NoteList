@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "819446322311",
+    "firebase_url": "https://notelist-cc9d2.firebaseio.com",
+    "project_id": "notelist-cc9d2",
+    "storage_bucket": "notelist-cc9d2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819446322311:android:a2a84ed75ae61dc4",
+        "android_client_info": {
+          "package_name": "evh.notelist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819446322311-u96vnoa3p6n54151rn0n47kdramv0093.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAA3KxF2X5apnNmTBwmbtHnf1fZgkSvFDY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
