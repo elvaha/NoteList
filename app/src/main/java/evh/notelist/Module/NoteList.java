@@ -3,6 +3,9 @@ package evh.notelist.Module;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.UUID;
+
 /**
  * Created by Elias on 05-12-2016.
  */
@@ -10,15 +13,18 @@ import android.os.Parcelable;
 public class NoteList implements Parcelable {
 
     private String name;
-    private int quantity;
+    private String quantity;
+    private ArrayList<NoteListItem> noteListItems;
 
     public NoteList(Parcel product){
         name = product.readString();
-        quantity = product.readInt();
     }
 
-    public NoteList(String name){
+    public NoteList(String name, String quantity){
         this.name = name;
+        this.quantity = quantity;
+//        this.id = UUID.randomUUID().toString();
+//        this.noteListItems = new ArrayList<NoteListItem>();
     }
 
     public NoteList(){
@@ -33,17 +39,34 @@ public class NoteList implements Parcelable {
         this.name = name;
     }
 
-    public int getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
 
+    //    public String getId(){ return id; }
+//    public ArrayList<NoteListItem> getNoteListItems(){
+//        return noteListItems;
+//    }
+
+//    public void addNoteListItem(NoteListItem noteListItem){
+//        noteListItems.add(noteListItem);
+//    }
+
     @Override
     public String toString(){
-        return name + ": " + quantity;
+        String noteList = "";
+
+        if(quantity == null || quantity == "0"){
+            noteList = name;
+            return noteList;
+        }else {
+            noteList = name + ": " + quantity;
+            return noteList;
+        }
     }
 
     @Override
@@ -54,7 +77,6 @@ public class NoteList implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeInt(quantity);
     }
 
     // Creator

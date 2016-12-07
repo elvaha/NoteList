@@ -8,29 +8,22 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.widget.EditText;
 
 /**
  * Created by Elias on 05-12-2016.
  */
 
-public class AddNoteListFragment extends DialogFragment {
+public class AddNoteListDialog extends DialogFragment {
 
     AddNoteListClicks mCallback;
-    android.app.AlertDialog.Builder alert;
-    Resources resources;
-    static String userInput = "";
 
-    public AddNoteListFragment(){
+    public AddNoteListDialog(){
 
     }
 
-    public static String getUserInput()
-    {
-        return userInput;
-    }
-
-    public AddNoteListFragment(Context context, String title, String message){
+    public AddNoteListDialog(Context context, String title, String message){
 
     }
 
@@ -43,9 +36,6 @@ public class AddNoteListFragment extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
         try {
             mCallback = (AddNoteListClicks) activity;
         } catch (ClassCastException e) {
@@ -56,14 +46,14 @@ public class AddNoteListFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final EditText input = new EditText(getActivity());
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+        alert.setTitle("Create note list");
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(
-                getActivity());
-        alert.setTitle("Confirmation");
-        alert.setView(input);
-        alert.setPositiveButton("Add", pListener);
-        alert.setNegativeButton("Cancel", nListener);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        alert.setView(inflater.inflate(R.layout.dialog_fragment, null));
+        alert.setPositiveButton(R.string.btnAdd, pListener);
+        alert.setNegativeButton(R.string.btnCancel, nListener);
         return alert.create();
     }
 
