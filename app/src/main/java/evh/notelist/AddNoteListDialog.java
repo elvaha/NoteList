@@ -5,11 +5,9 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
-import android.widget.EditText;
 
 /**
  * Created by Elias on 05-12-2016.
@@ -51,7 +49,7 @@ public class AddNoteListDialog extends DialogFragment {
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        alert.setView(inflater.inflate(R.layout.dialog_fragment, null));
+        alert.setView(inflater.inflate(R.layout.addNoteList_dialog, null));
         alert.setPositiveButton(R.string.btnAdd, pListener);
         alert.setNegativeButton(R.string.btnCancel, nListener);
         return alert.create();

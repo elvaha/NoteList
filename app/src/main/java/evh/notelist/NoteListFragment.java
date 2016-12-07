@@ -39,8 +39,6 @@ public class NoteListFragment extends android.support.v4.app.Fragment{
 
     }
 
-
-
     public interface NoteListFragmentfunctionality{
         public void fabClick();
         public void btnAddClick();
