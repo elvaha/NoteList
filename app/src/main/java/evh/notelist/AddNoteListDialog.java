@@ -49,7 +49,7 @@ public class AddNoteListDialog extends DialogFragment {
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        alert.setView(inflater.inflate(R.layout.addNoteList_dialog, null));
+        alert.setView(inflater.inflate(R.layout.addnotelist_dialog, null));
         alert.setPositiveButton(R.string.btnAdd, pListener);
         alert.setNegativeButton(R.string.btnCancel, nListener);
         return alert.create();

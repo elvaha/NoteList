@@ -49,19 +49,18 @@ public class NoteListFragment extends android.support.v4.app.Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
-        this.inflatedView = inflater.inflate(R.layout.fragment_notelist_items_fragment, container, false);
+        this.inflatedView = inflater.inflate(R.layout.addnotelist_dialog, container, false);
 //        GET ID FROM BUNDLE
-//        setAdapter();
 
-        Button btnaddItem = (Button) inflatedView.findViewById(R.id.btnAddItem);
-        btnaddItem.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Toast toast  = Toast.makeText(getActivity().getApplicationContext(), "somerset", Toast.LENGTH_SHORT);
-                toast.show();
-                System.out.println("CLICKED");
-            }
-        });
+//        Button btnaddItem = (Button) inflatedView.findViewById(R.id.btn);
+//        btnaddItem.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Toast toast  = Toast.makeText(getActivity().getApplicationContext(), "somerset", Toast.LENGTH_SHORT);
+//                toast.show();
+//                System.out.println("CLICKED");
+//            }
+//        });
 
         return inflatedView;
     }

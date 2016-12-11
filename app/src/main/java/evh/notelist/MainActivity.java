@@ -1,24 +1,20 @@
 package evh.notelist;
 
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.SmsManager;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,15 +23,10 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.UUID;
 
 import evh.notelist.Module.NoteList;
-import evh.notelist.Module.NoteListItem;
 
 public class MainActivity extends AppCompatActivity implements AddNoteListDialog.AddNoteListClicks, SendSmsDialog.AddSmsSendClick {
 
@@ -51,9 +42,10 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
     NoteListFragment fragment = new NoteListFragment();
     Context context;
     String listId;
-    int itemIndex;
+    int itemIndex = -1;
     String sms;
     NoteList deletedNoteList;
+    SettingsDialog settingsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
 //        getActionBar().setHomeButtonEnabled(true);
         dialog = new AddNoteListDialog();
         smsDialog = new SendSmsDialog();
+        settingsDialog = new SettingsDialog();
 
         SharedPreferences prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         if (prefs.contains("NoteListToken"))
@@ -106,9 +99,14 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         fabDel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                deletedNoteList = (NoteList) getMyAdapter().getItem(itemIndex);
-                getMyAdapter().getRef(itemIndex).setValue(null);
-                showSnackbar();
+                if(itemIndex == -1){
+                    Toast toast = Toast.makeText(context, "Item not selected", Toast.LENGTH_SHORT);
+                    toast.show();
+                }else {
+                    deletedNoteList = (NoteList) getMyAdapter().getItem(itemIndex);
+                    getMyAdapter().getRef(itemIndex).setValue(null);
+                    showSnackbar();
+                }
             }
         });
     }
@@ -144,7 +142,12 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                itemIndex = position;
+                if(itemIndex != position){
+                    itemIndex = position;
+                }else  if(itemIndex == position){
+                    listView.setItemChecked(itemIndex, false);
+                    itemIndex = -1;
+                }
             }
         });
 
@@ -182,11 +185,12 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
                         Toast.LENGTH_SHORT).show();
                 return true; //return true, means we have handled the event
             case R.id.action_settings:
+                openSettings();
                 return true;
             case R.id.action_Info:
                 return true;
             case R.id.action_DeleteAll:
-                firebase.setValue(null);
+                warningDialog();
                 return true;
             case R.id.action_SendList:
                 openSmsDialog();
@@ -194,6 +198,29 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         }
 
         return false;
+    }
+
+    public void openSettings(){
+        settingsDialog.show(getFragmentManager(), "settingsdialog");
+    }
+
+    public void warningDialog(){
+        final AlertDialog.Builder warningDialog = new AlertDialog.Builder(this);
+        warningDialog.setTitle("Warning");
+        warningDialog.setMessage("Are you aure you want to clear the list?");
+        warningDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                firebase.setValue(null);
+            }
+        });
+        warningDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        warningDialog.show();
     }
 
 

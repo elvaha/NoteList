@@ -18,12 +18,13 @@
         android:id="@+id/action_DeleteAll"
         android:orderInCategory="100"
         android:title="@string/action_deleteAll"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_delete_forever_white_18dp"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_SendList"
         android:orderInCategory="100"
         android:title="Send"
-        android:icon="@drawable/ic_email_white_18dp"
+        android:icon="@drawable/ic_send_white_18dp"
         app:showAsAction="always"
         />
 
