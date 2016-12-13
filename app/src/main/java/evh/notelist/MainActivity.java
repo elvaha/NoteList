@@ -1,6 +1,7 @@
 package evh.notelist;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,7 +30,7 @@ import java.util.UUID;
 
 import evh.notelist.Module.NoteList;
 
-public class MainActivity extends AppCompatActivity implements AddNoteListDialog.AddNoteListClicks, SendSmsDialog.AddSmsSendClick {
+public class MainActivity extends AppCompatActivity implements AddNoteListDialog.AddNoteListClicks {
 
     FloatingActionButton fab;
     FirebaseListAdapter mAdapter;
@@ -38,14 +40,13 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
     ListView listView;
     NoteList lastDeletedNoteList;
     AddNoteListDialog dialog;
-    SendSmsDialog smsDialog;
     NoteListFragment fragment = new NoteListFragment();
     Context context;
     String listId;
     int itemIndex = -1;
-    String sms;
     NoteList deletedNoteList;
-    SettingsDialog settingsDialog;
+    Dialog settingsDialog;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +56,8 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         setSupportActionBar(toolbar);
 //        getActionBar().setHomeButtonEnabled(true);
         dialog = new AddNoteListDialog();
-        smsDialog = new SendSmsDialog();
-        settingsDialog = new SettingsDialog();
 
-        SharedPreferences prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         if (prefs.contains("NoteListToken"))
         {
             token = prefs.getString("NoteListToken","");
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         context = getApplicationContext();
         btnAddNoteListClick();
         btnDeleteNoteListClick();
+//        settingsDialogClickListeners();
     }
 
     @Override
@@ -185,15 +185,13 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
                         Toast.LENGTH_SHORT).show();
                 return true; //return true, means we have handled the event
             case R.id.action_settings:
-                openSettings();
-                return true;
-            case R.id.action_Info:
+//                openSettings();
                 return true;
             case R.id.action_DeleteAll:
                 warningDialog();
                 return true;
             case R.id.action_SendList:
-                openSmsDialog();
+                SendList(createSms());
                 return true;
         }
 
@@ -201,7 +199,43 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
     }
 
     public void openSettings(){
-        settingsDialog.show(getFragmentManager(), "settingsdialog");
+        settingsDialog = new Dialog(MainActivity.this);
+        settingsDialog.setTitle("Settings");
+        settingsDialog.setContentView(R.layout.settings_dialog);
+        settingsDialog.show();
+    }
+
+    public void settingsDialogClickListeners(){
+        final TextView tokenView = (TextView) findViewById(R.id.settings_token);
+        final EditText tokenEdit = (EditText) findViewById(R.id.settings_token_edit);
+        final Button btnTokenChange = (Button) findViewById(R.id.btn_settings_change);
+
+        tokenView.setText(token);
+        tokenEdit.setText(token);
+        tokenView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                tokenView.setVisibility(View.GONE);
+                tokenEdit.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnTokenChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                token = tokenEdit.getText().toString();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("NoteListToken", token);
+                editor.commit();
+
+                tokenView.setText(token);
+                tokenEdit.setVisibility(View.GONE);
+                tokenView.setVisibility(View.VISIBLE);
+
+                Toast.makeText(context, "Token has been Changed", Toast.LENGTH_SHORT).show();
+                settingsDialog.dismiss();
+            }
+        });
     }
 
     public void warningDialog(){
@@ -223,29 +257,17 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         warningDialog.show();
     }
 
-
-    public void openSmsDialog(){
-        smsDialog.show(getFragmentManager(), "something");
-//        TextView smsSample = (TextView) smsDialog.getDialog().findViewById(R.id.sms_message);
-//        smsSample.setText(createSms().substring(0, 50) + " ...");
-    }
-
-    public void SendList(String phoneNumber, String message){
-        if(phoneNumber == ""){
-            Toast.makeText(context, "Phone number invalid", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse( "sms:" + phoneNumber ) );
+    public void SendList(String message){
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse( "sms:") );
         intent.putExtra( "sms_body", message );
         startActivity(intent);
-
-//        SmsManager sms = SmsManager.getDefault();
-//        sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
     public String createSms(){
-        for(int i = 1; i < getMyAdapter().getCount(); i++){
-            NoteList notelist = (NoteList) getMyAdapter().getItem(i);
+        NoteList notelist;
+        String sms = "";
+        for(int i = 0; i < getMyAdapter().getCount(); i++){
+            notelist = (NoteList) getMyAdapter().getItem(i);
             sms += notelist.toString()
                     + System.getProperty ("line.separator");
         }
@@ -262,15 +284,6 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         noteName.setText("");
         dialog.dismiss();
         Toast toast = Toast.makeText(context, "\"" + noteList.getName() + "\" has been created", Toast.LENGTH_SHORT);
-        toast.show();
-    }
-
-    @Override
-    public void onSendClick() {
-        EditText phoneNumber = (EditText) smsDialog.getDialog().findViewById(R.id.sms_phonenumber);
-        SendList(phoneNumber.getText().toString(), createSms());
-
-        Toast toast = Toast.makeText(context, "Message has been send", Toast.LENGTH_SHORT);
         toast.show();
     }
 
