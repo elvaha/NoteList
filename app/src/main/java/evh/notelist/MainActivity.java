@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
     NoteList deletedNoteList;
     Dialog settingsDialog;
     SharedPreferences prefs;
+    String Name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//        getActionBar().setHomeButtonEnabled(true);
+
         dialog = new AddNoteListDialog();
 
         prefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
@@ -67,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("NoteListToken", token);
             editor.commit();
+        }
+        if(prefs.contains("ListUserName")){
+            Name = prefs.getString("ListUserName", "");
+            setTitle(Name + "'s List" );
         }
 
         firebase = FirebaseDatabase.getInstance().getReference().child(token);
@@ -82,6 +87,21 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==1) //from settings
+        {
+            String name = SettingsFragment.getName(this);
+            String message = "Welcome, "+name;
+            setTitle(name + "'s List");
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("ListUserName", name);
+            editor.commit();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void btnAddNoteListClick(){
@@ -185,7 +205,8 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
                         Toast.LENGTH_SHORT).show();
                 return true; //return true, means we have handled the event
             case R.id.action_settings:
-//                openSettings();
+                Intent intent = new Intent(this,SettingsActivity.class);
+                startActivityForResult(intent,1);
                 return true;
             case R.id.action_DeleteAll:
                 warningDialog();
@@ -201,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements AddNoteListDialog
     public void openSettings(){
         settingsDialog = new Dialog(MainActivity.this);
         settingsDialog.setTitle("Settings");
-        settingsDialog.setContentView(R.layout.settings_dialog);
+        settingsDialog.setContentView(R.layout.settings_fragment);
         settingsDialog.show();
     }
 
